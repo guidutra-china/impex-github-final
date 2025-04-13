@@ -7,6 +7,8 @@ use App\Filament\Resources\CompanyResource\RelationManagers;
 use App\Models\Company;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
+use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -118,7 +120,9 @@ class CompanyResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -126,6 +130,40 @@ class CompanyResource extends Resource
                 ]),
             ]);
     }
+
+//    public static function infolist(Infolist $infolist): Infolist
+//    {
+//        ->schema([
+//            Components\Section::make()
+//                ->schema([
+//                    Components\Split::make([
+//                        Components\Grid::make(2)
+//                            ->schema([
+//                                Components\Group::make([
+//                                    Components\TextEntry::make('name'),
+//                                    Components\TextEntry::make('address'),
+//                                    Components\TextEntry::make('city'),
+//                                    Components\TextEntry::make('State'),
+//                                    Components\TextEntry::make('zip'),
+//                                    Components\TextEntry::make('country'),
+//                                ]),
+//                                Components\Group::make([
+//                                    Components\TextEntry::make('phone'),
+//                                    Components\TextEntry::make('email'),
+//                                    Components\TextEntry::make('website')
+//                                ]),
+//                            ]),
+//                ]),
+//            Components\Section::make('Content')
+//                ->schema([
+//                    Components\TextEntry::make('content')
+//                        ->prose()
+//                        ->markdown()
+//                        ->hiddenLabel(),
+//                ])
+//                ->collapsible(),
+//        ]);
+//    }
 
     public static function getRelations(): array
     {
@@ -140,6 +178,7 @@ class CompanyResource extends Resource
             'index' => Pages\ListCompanies::route('/'),
             'create' => Pages\CreateCompany::route('/create'),
             'edit' => Pages\EditCompany::route('/{record}/edit'),
+            'view' => Pages\ViewCompany::route('/{record}'),
         ];
     }
 }
