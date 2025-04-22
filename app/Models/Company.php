@@ -7,9 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Company extends Model
+
+class Company extends Model implements HasMedia
 {
+
+    use InteractsWithMedia;
     use SoftDeletes;
     use HasFactory;
 
@@ -23,8 +29,13 @@ class Company extends Model
         'phone',
         'email',
         'website',
-        'is_supplier',
-        'is_customer',
+        'type',
+    ];
+
+    protected $casts = [
+
+        'images' => 'array',
+
     ];
 
     public function tags(): morphToMany
@@ -36,4 +47,12 @@ class Company extends Model
     {
         return $this->belongsToMany(Contact::class);
     }
+
+    public function images(): MorphToMany
+    {
+        return $this->morphToMany(Media::class, 'media');
+    }
+
+
+
 }

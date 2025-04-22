@@ -8,7 +8,6 @@ use App\Models\Company;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
-use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
+use Filament\Forms\Components\Tabs;
 
 class CompanyResource extends Resource
 {
@@ -28,148 +28,69 @@ class CompanyResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('city')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('state')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('zip')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('country')
-                    ->maxLength(255),
-                PhoneInput::make('phone'),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('website')
-                    ->maxLength(255),
-                Forms\Components\Select::make('type')
-                    ->label('Supplier/Client/Both')
-                    ->options([
-                        'supplier' => 'Supplier',
-                        'client' => 'Client',
-                        'both' => 'Both',
-                    ]),
-                Forms\Components\Select::make('tags')
-                ->relationship('tags', 'name')
-                ->multiple()
-                ->preload(),
-            ]);
+                Tabs::make('Tabs')
+                    ->tabs([
+                        Tabs\Tab::make('Details')
+                            ->schema([
+                                Forms\Components\TextInput::make('name')->required()->maxLength(255),
+                                Forms\Components\TextInput::make('address')->maxLength(255),
+                                Forms\Components\TextInput::make('city')->maxLength(255),
+                                Forms\Components\TextInput::make('state')->maxLength(255),
+                                Forms\Components\TextInput::make('zip')->maxLength(255),
+                                Forms\Components\TextInput::make('country')->maxLength(255),
+                                PhoneInput::make('phone'),
+                                Forms\Components\TextInput::make('email')->email()->maxLength(255),
+                                Forms\Components\TextInput::make('website')->maxLength(255),
+                                Forms\Components\Select::make('type')
+                                    ->label('Supplier/Client/Both')
+                                    ->options([
+                                        'supplier' => 'Supplier',
+                                        'client' => 'Client',
+                                        'both' => 'Both',
+                                    ]),
+                                Forms\Components\Select::make('tags')
+                                    ->relationship('tags', 'name')
+                                    ->multiple()
+                                    ->preload(),
+                            ])
+                        ->columns(2),
+                        Tabs\Tab::make('Images')
+                            ->schema([
+                               Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                                    ->collection('companies')
+                                    ->multiple()
+                                    ->reorderable()
+                                    ->downloadable()
+                            ]),
+                    ])
+                    ->columns(0),
+            ])
+            ->columns(0);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(function ($query) {
-                // Here we are eager loading our tags to prevent N+1 issue
-                return $query->with('tags');
-            })
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('address')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('city')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('state')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('zip')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('country')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
-                PhoneColumn::make('phone')->displayFormat(PhoneInputNumberType::INTERNATIONAL)
-                ->toggleable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('website')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->badge()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tags.name')
-                    ->formatStateUsing(function ($record) {
-                        $tagsList = view('company.tagsList', ['tags' => $record->tags])->render();
-                        return $tagsList;
-                    })
-                ->html()
-                ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
+                Tables\Columns\TextColumn::make('name')->searchable(),
+                Tables\Columns\TextColumn::make('email')->searchable(),
+                Tables\Columns\TextColumn::make('type')->badge()->searchable(),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
-//    public static function infolist(Infolist $infolist): Infolist
-//    {
-//        ->schema([
-//            Components\Section::make()
-//                ->schema([
-//                    Components\Split::make([
-//                        Components\Grid::make(2)
-//                            ->schema([
-//                                Components\Group::make([
-//                                    Components\TextEntry::make('name'),
-//                                    Components\TextEntry::make('address'),
-//                                    Components\TextEntry::make('city'),
-//                                    Components\TextEntry::make('State'),
-//                                    Components\TextEntry::make('zip'),
-//                                    Components\TextEntry::make('country'),
-//                                ]),
-//                                Components\Group::make([
-//                                    Components\TextEntry::make('phone'),
-//                                    Components\TextEntry::make('email'),
-//                                    Components\TextEntry::make('website')
-//                                ]),
-//                            ]),
-//                ]),
-//            Components\Section::make('Content')
-//                ->schema([
-//                    Components\TextEntry::make('content')
-//                        ->prose()
-//                        ->markdown()
-//                        ->hiddenLabel(),
-//                ])
-//                ->collapsible(),
-//        ]);
-//    }
-
     public static function getRelations(): array
     {
-            return [
-                RelationManagers\ContactsRelationManager::class,
-            ];
+        return [
+            RelationManagers\ContactsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

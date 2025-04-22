@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FamilyResource\Pages;
-use App\Filament\Resources\FamilyResource\RelationManagers;
+//use App\Filament\Resources\FamilyResource\RelationManagers;
 use App\Models\Family;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,6 +17,7 @@ class FamilyResource extends Resource
 {
     protected static ?string $model = Family::class;
 
+    protected static ?string $navigationGroup = 'Settings';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
