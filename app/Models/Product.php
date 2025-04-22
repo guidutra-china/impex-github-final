@@ -41,4 +41,9 @@ class Product extends Model implements HasMedia
         return $this->morphToMany(Media::class, 'media');
     }
 
+    public function tags(): morphToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+
 }

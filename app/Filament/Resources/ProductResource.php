@@ -54,7 +54,10 @@ class ProductResource extends Resource
                             ->relationship('Family', 'name')
                             ->preload()
                             ->searchable()
-                            ->nullable()
+                            ->nullable(),
+                        Forms\Components\Select::make('tags')
+                            ->relationship('tags', 'name')
+                            ->preload(),
                     ]),
 
                     Tabs\Tab::make('Images')
@@ -82,7 +85,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                 ->searchable()
                 ->sortable()
-                ->limit(50),
+                ->limit(30),
                 Tables\Columns\TextColumn::make('sku_client')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sku_supplier')
@@ -106,6 +109,11 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('family.name')
                     ->label('Family')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tags.name')
+                    ->label('Tags')
+                    ->badge()
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
