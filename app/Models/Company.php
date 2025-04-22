@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -53,6 +54,24 @@ class Company extends Model implements HasMedia
         return $this->morphToMany(Media::class, 'media');
     }
 
+    public function productsWithClients(): HasMany
+    {
+        return $this->hasMany(Product::class, 'client_id');
+    }
+
+    public function productsWithSuppliers(): HasMany
+    {
+        return $this->hasMany(Product::class, 'supplier_id');
+    }
+    public function scopeClients($query)
+    {
+        return $query->whereIn('type', ['client', 'both']);
+    }
+
+    public function scopeSuppliers($query)
+    {
+        return $query->whereIn('type', ['supplier', 'both']);
+    }
 
 
 }

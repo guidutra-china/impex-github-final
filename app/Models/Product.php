@@ -45,5 +45,14 @@ class Product extends Model implements HasMedia
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'client_id');
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'supplier_id');
+    }
 
 }
