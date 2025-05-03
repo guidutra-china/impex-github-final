@@ -57,10 +57,12 @@ class ProductResource extends Resource
                             ->nullable(),
                         Forms\Components\Select::make('client_id')
                             ->label('Client')
-                            ->relationship(name: 'client', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->clients()),
+                            ->relationship(name: 'client', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->clients())
+                            ->searchable(),
                         Forms\Components\Select::make('supplier_id')
                         ->label('Supplier')
-                        ->relationship('Supplier', 'name', modifyQueryUsing: fn ($query) => $query->suppliers()),
+                        ->relationship('Supplier', 'name', modifyQueryUsing: fn ($query) => $query->suppliers())
+                        ->searchable(),
                         Forms\Components\Select::make('tags')
                             ->relationship('tags', 'name')
                             ->preload(),
