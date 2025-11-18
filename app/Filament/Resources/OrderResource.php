@@ -24,6 +24,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Get; // Import Get
 use Illuminate\Support\Collection; // For validation
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 
 
 class OrderResource extends Resource
@@ -76,49 +77,75 @@ class OrderResource extends Resource
     public static function getStep1FormSchema(): array
     {
         return [
-            Grid::make(2)->schema([
-                TextInput::make('order_number')
-                    ->label('Order Number')
-                    ->required()
-                    ->maxLength(255)
-                    ->unique(Order::class, 'order_number', ignoreRecord: true),
+            // Seção 1: RFQ Information
+            Section::make('RFQ Information')
+                ->description('Request for Quotation details')
+                ->schema([
+                    Grid::make(2)->schema([
+                        TextInput::make('order_number')
+                            ->label('Order Number')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Order::class, 'order_number', ignoreRecord: true),
 
-                DatePicker::make('order_date')
-                    ->required(),
+                        DatePicker::make('order_date')
+                            ->required()
+                            ->default(now()),
 
-                Select::make('client_company_id')
-                    ->label('Client')
-                    ->relationship('client', 'name', modifyQueryUsing: fn (Builder $query) => $query->whereIn('type', ['client', 'both']))
-                    ->required()
-                    ->searchable()
-                    ->preload(),
+                        TextInput::make('client_number')
+                            ->label('Client PO Number')
+                            ->maxLength(255),
 
-                Select::make('supplier_company_id')
-                    ->label('Supplier')
-                    ->relationship('supplier', 'name', modifyQueryUsing: fn (Builder $query) => $query->whereIn('type', ['supplier', 'both']))
-                    ->searchable()
-                    ->preload(),
+                        TextInput::make('supplier_number')
+                            ->label('Supplier Order Number')
+                            ->maxLength(255),
+                    ]),
+                ])
+                ->collapsible(),
 
-                Select::make('payment_id')
-                    ->label('Payment Method')
-                    ->relationship('paymentMethod', 'name')
-                    ->searchable()
-                    ->preload(),
+            // Seção 2: Customer & Currency
+            Section::make('Customer & Currency')
+                ->description('Client, supplier and payment information')
+                ->schema([
+                    Grid::make(2)->schema([
+                        Select::make('client_company_id')
+                            ->label('Client')
+                            ->relationship('client', 'name', modifyQueryUsing: fn (Builder $query) => $query->whereIn('type', ['client', 'both']))
+                            ->required()
+                            ->searchable()
+                            ->preload(),
 
-                TextInput::make('origen')
-                    ->maxLength(255),
+                        Select::make('supplier_company_id')
+                            ->label('Supplier')
+                            ->relationship('supplier', 'name', modifyQueryUsing: fn (Builder $query) => $query->whereIn('type', ['supplier', 'both']))
+                            ->searchable()
+                            ->preload(),
 
-                TextInput::make('destination')
-                    ->maxLength(255),
+                        Select::make('payment_id')
+                            ->label('Payment Method')
+                            ->relationship('paymentMethod', 'name')
+                            ->searchable()
+                            ->preload(),
+                    ]),
+                ])
+                ->collapsible(),
 
-                TextInput::make('client_number')
-                    ->label('Client PO Number')
-                    ->maxLength(255),
+            // Seção 3: Logistics
+            Section::make('Logistics')
+                ->description('Origin and destination information')
+                ->schema([
+                    Grid::make(2)->schema([
+                        TextInput::make('origen')
+                            ->label('Origin')
+                            ->maxLength(255)
+                            ->placeholder('Enter origin location'),
 
-                TextInput::make('supplier_number')
-                    ->label('Supplier Order Number')
-                    ->maxLength(255),
-            ])
+                        TextInput::make('destination')
+                            ->maxLength(255)
+                            ->placeholder('Enter destination location'),
+                    ]),
+                ])
+                ->collapsible(),
         ];
     }
 
